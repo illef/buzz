@@ -1,4 +1,25 @@
+use std::process::*;
+
+fn unseen_mail_count() -> Result<usize, String> {
+    let stdout = Command::new("bash")
+        .arg("-c")
+        .arg("notmuch search 'tag:unread and folder:/.*inbox/'")
+        .output()
+        .map_err(|e| e.to_string())?
+        .stdout;
+
+    Ok(std::str::from_utf8(&stdout)
+        .map_err(|e| e.to_string())?
+        .lines()
+        .count())
+}
+
 fn main() {
+    if let Err(e) = unseen_mail_count() {
+        println!("Could not get unseen mail count, err : {}", e);
+        return;
+    }
+
     let mut app = match systray::Application::new() {
         Ok(app) => app,
         Err(e) => {
