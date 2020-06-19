@@ -9,7 +9,7 @@ fn unseen_mail_count() -> Result<usize, String> {
 
     let stdout = Command::new("bash")
         .arg("-c")
-        .arg("notmuch search 'tag:unread and folder:/.*inbox/'")
+        .arg("notmuch search 'tag:unread and folder:/.*INBOX/'")
         .output()
         .map_err(|e| e.to_string())?
         .stdout;
