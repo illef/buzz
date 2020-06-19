@@ -20,7 +20,7 @@ fn main() {
         return;
     }
 
-    let mut app = match systray::Application::new() {
+    let app = match systray::Application::new() {
         Ok(app) => app,
         Err(e) => {
             println!("Could not create gtk application: {}", e);
@@ -34,5 +34,22 @@ fn main() {
         println!("Could not set application icon: {}", e);
     }
 
-    app.wait_for_message().unwrap();
+    loop {
+        match unseen_mail_count() {
+            Ok(count) => {
+                if count > 0 {
+                    app.set_icon_from_file(
+                        &"/usr/share/icons/oxygen/base/32x32/status/mail-unread-new.png"
+                            .to_string(),
+                    )
+                    .unwrap();
+                }
+            }
+            Err(e) => {
+                println!("Something wrong!, err: {}", e);
+                return;
+            }
+        }
+        std::thread::sleep(std::time::Duration::from_secs(10));
+    }
 }
