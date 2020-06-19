@@ -1,6 +1,12 @@
 use std::process::*;
 
 fn unseen_mail_count() -> Result<usize, String> {
+    let _ = Command::new("bash")
+        .arg("-c")
+        .arg("notmuch new")
+        .output()
+        .map_err(|e| e.to_string())?;
+
     let stdout = Command::new("bash")
         .arg("-c")
         .arg("notmuch search 'tag:unread and folder:/.*inbox/'")
