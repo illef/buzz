@@ -21,6 +21,19 @@ fn unseen_mail_count() -> Result<usize, String> {
 }
 
 fn main() {
+    use std::fs::File;
+    use std::io::prelude::*;
+
+    File::create("/tmp/buzz-default.svg")
+        .unwrap()
+        .write_all(include_bytes!("../default.svg"))
+        .unwrap();
+
+    File::create("/tmp/buzz-unread.svg")
+        .unwrap()
+        .write_all(include_bytes!("../unread.svg"))
+        .unwrap();
+
     if let Err(e) = unseen_mail_count() {
         println!("Could not get unseen mail count, err : {}", e);
         return;
@@ -34,21 +47,17 @@ fn main() {
         }
     };
 
-    if let Err(e) = app
-        .set_icon_from_file(&"/usr/share/icons/oxygen/base/32x32/status/mail-read.png".to_string())
-    {
+    if let Err(e) = app.set_icon_from_file(&"/tmp/buzz-default.svg") {
         println!("Could not set application icon: {}", e);
+        return;
     }
 
     loop {
         match unseen_mail_count() {
             Ok(count) => {
                 if count > 0 {
-                    app.set_icon_from_file(
-                        &"/usr/share/icons/oxygen/base/32x32/status/mail-unread-new.png"
-                            .to_string(),
-                    )
-                    .unwrap();
+                    app.set_icon_from_file(&"/tmp/buzz-unread.svg".to_string())
+                        .unwrap();
                 }
             }
             Err(e) => {
