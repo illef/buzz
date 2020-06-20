@@ -34,11 +34,6 @@ fn main() {
         .write_all(include_bytes!("../unread.svg"))
         .unwrap();
 
-    if let Err(e) = unseen_mail_count() {
-        println!("Could not get unseen mail count, err : {}", e);
-        return;
-    }
-
     let app = match systray::Application::new() {
         Ok(app) => app,
         Err(e) => {
@@ -47,16 +42,14 @@ fn main() {
         }
     };
 
-    if let Err(e) = app.set_icon_from_file(&"/tmp/buzz-default.svg") {
-        println!("Could not set application icon: {}", e);
-        return;
-    }
-
     loop {
         match unseen_mail_count() {
             Ok(count) => {
                 if count > 0 {
                     app.set_icon_from_file(&"/tmp/buzz-unread.svg".to_string())
+                        .unwrap();
+                } else {
+                    app.set_icon_from_file(&"/tmp/buzz-default.svg".to_string())
                         .unwrap();
                 }
             }
